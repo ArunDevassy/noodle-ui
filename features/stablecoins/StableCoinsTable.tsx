@@ -169,7 +169,7 @@ const StableCoinsTable = () => {
 				<div className="relative rounded-full bg-[var(--bg-hover)] text-[var(--text)]">
 					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
 					<Input
-						placeholder={"Search stablecoins..."}
+						placeholder={"Search by name or symbol..."}
 						value={search}
 						onChange={(e) => {
 							setSearch(e.target.value);
