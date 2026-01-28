@@ -100,7 +100,15 @@ const StableCoinsTable = () => {
 	const [sortBy, setSortBy] = useState<"default" | "market_cap" | "price" | "volume">("default");
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-	const debouncedSearch = useDebounce(search, 300);
+	const [searchQuery, setSearchQuery] = useState('');
+	const debouncedSearchQ = useDebounce(searchQuery,500);
+	const {data, isLoading, isError, refetch} = useGetStableCoinsList({
+			q : debouncedSearchQ,
+			limit:20,
+			page:1
+		});
+
+/* 	const debouncedSearch = useDebounce(search, 300);
 	const { data, isLoading, isError, refetch } = useGetStableCoinsList({
 		q: debouncedSearch,
 		page,
@@ -108,7 +116,7 @@ const StableCoinsTable = () => {
 		sortBy: sortBy === "default" ? null : "market_cap",
 		sortDir: sortBy === "default" ? null : sortDir,
 	});
-
+ */
 	const {
 		mutate: compare,
 		data: comparisonData,
@@ -163,9 +171,13 @@ const StableCoinsTable = () => {
 		setSelectedAssets([]);
 	};
 
+	const handleFilterTextChange = (e) =>{
+		setSearchQuery(e.target.value);
+	};
+
 	return (
 		<div>
-			<div className="bg-gradient-to-r from-[#DDF346] to-[#84EA0700] p-[1px] rounded-full w-[320px] mb-4">
+			{/* <div className="bg-gradient-to-r from-[#DDF346] to-[#84EA0700] p-[1px] rounded-full w-[320px] mb-4">
 				<div className="relative rounded-full bg-[var(--bg-hover)] text-[var(--text)]">
 					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
 					<Input
@@ -189,6 +201,19 @@ const StableCoinsTable = () => {
 						</button>
 					)}
 				</div>
+			</div> */}
+			<div className="my-3.5">
+				<input type="text" name="filterText" 
+					placeholder="Please enter your filter value here..."
+					className=" h-1/2 w-1/2 p-0.5 rounded-2xl border-2"
+					value={searchQuery}
+					onChange={(e)=>handleFilterTextChange(e)}
+				/>
+				{searchQuery && 
+				<button className="ml-2 cursor-pointer bg-blue-300 hover:bg-blue-400 rounded-2xl p-1"
+				onClick={()=>setSearchQuery('')}
+				>X</button>
+				}
 			</div>
 			<Table>
 				<TableHeader className="bg-[var(--bg-hover)]">
