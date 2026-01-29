@@ -90,6 +90,43 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }: Pagination
 	);
 };
 
+const ErrorBanner = ({ onRetry }: { onRetry: () => void }) => {
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0">
+          <svg
+            className="w-5 h-5 text-red-500"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-medium text-red-800">
+            Failed to load stablecoins
+          </h3>
+          <p className="mt-1 text-sm text-red-700">
+            We couldn't fetch the stablecoin data. This might be a temporary
+            network issue.
+          </p>
+        </div>
+        <button
+          onClick={onRetry}
+          className="flex-shrink-0 bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded text-sm font-medium transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const StableCoinsTable = () => {
 	const router = useRouter();
 	const [page, setPage] = useState(1);
@@ -113,6 +150,12 @@ const StableCoinsTable = () => {
 			limit:LIMIT,
 			page
 		});
+
+	const handleRetry = () => {
+		setSearchQuery(""); // Clear search
+		setPage(1); // Reset to page 1
+		// The hook will automatically refetch when dependencies change
+	};
 
 /* 	const debouncedSearch = useDebounce(search, 300);
 	const { data, isLoading, isError, refetch } = useGetStableCoinsList({
@@ -227,6 +270,9 @@ const StableCoinsTable = () => {
 				>X</button>
 				}
 			</div>
+			{
+  				isError && !isLoading && <ErrorBanner onRetry={handleRetry} />
+			}
 			<Table>
 				<TableHeader className="bg-[var(--bg-hover)]">
 					<TableRow className="border-b-[var(--border)]">
