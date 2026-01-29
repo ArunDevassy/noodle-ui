@@ -100,12 +100,18 @@ const StableCoinsTable = () => {
 	const [sortBy, setSortBy] = useState<"default" | "market_cap" | "price" | "volume">("default");
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
+	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+	const handleSortMarketCap = () => {
+		setSortDirection(sortDirection == "asc" ? "desc" : "asc");
+	};
+	
+
 	const [searchQuery, setSearchQuery] = useState('');
 	const debouncedSearchQ = useDebounce(searchQuery,500);
 	const {data, isLoading, isError, refetch} = useGetStableCoinsList({
 			q : debouncedSearchQ,
-			limit:20,
-			page:1
+			limit:LIMIT,
+			page
 		});
 
 /* 	const debouncedSearch = useDebounce(search, 300);
@@ -126,7 +132,13 @@ const StableCoinsTable = () => {
 	const { data: userData } = useMe()
 	const { mutate: addLog } = useAddUserActivityLog();
 
-	const items = data?.items ?? [];
+	const rowItems = data?.items ?? [];
+	const items = [...rowItems].sort((a,b)=>{
+		const aValue = a.marketCap || 0;
+		const bValue = b.marketCap  || 0;
+		return sortDirection==="asc" ? aValue - bValue : bValue - aValue;
+	});
+
 	const total = data?.total ?? 0;
 	const totalPages = Math.ceil(total / LIMIT);
 
@@ -241,13 +253,23 @@ const StableCoinsTable = () => {
 									(sortDir === "desc" ? <ChevronDown size={12} /> : <ChevronUp size={12} />)}
 							</div>
 						</TableHead>
-						<TableHead
+{/* 						<TableHead
 							className="text-[var(--text-table)] border-b-[var(--border)] font-noto font-normal text-xs w-[120px] text-center cursor-pointer"
 							onClick={() => toggleSort("market_cap")}
 						>
 							<div className="flex items-center justify-center gap-1">
 								Market Cap
 								{sortBy === "market_cap" && (sortDir === "desc" ? <ChevronDown size={12} /> : <ChevronUp size={12} />)}
+							</div>
+						</TableHead> */}
+						<TableHead
+							className="text-[var(--text-table)] border-b-[var(--border)] font-noto font-normal text-xs w-[120px] text-center cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
+							onClick={handleSortMarketCap}
+							>
+							<div className="flex items-center justify-center gap-1">
+								Market Cap
+								<span className="text-[10px]">{sortDirection === "asc" ? "↑" : "↓"}</span>
+								{/* {sortDirection === "desc" ? <ChevronDown size={12} /> : <ChevronUp size={12} />} */}
 							</div>
 						</TableHead>
 						<TableHead className="text-[var(--text-table)] border-b-[var(--border)] font-noto font-normal text-xs w-[140px] text-end">Circulating Supply</TableHead>
